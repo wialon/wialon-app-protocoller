@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!-- ************************************************************************
+
+   Apps - WEB applications, developed on the basis of SDK for Wialon Hosting and Wialon Kit.
+
+   http://apps.wialon.com
+
+   Copyright:
+     2002-2013 Gurtam, http://gurtam.com
+
+   License:
+     LGPL: http://www.gnu.org/licenses/lgpl.html
+
+   Authors:
+     * Gurtam
+
+************************************************************************ -->
+<html>
+	<head>
+		<link rel="icon" type="image/png" href="./img/favicon.ico">
+		<title>Protocoller</title>
+		
+		<script type="text/javascript" src="./js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="./js/jquery.localisation.js"></script>
+		<script type="text/javascript" src="./js/jquery.tooltip.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/style.css"/>
+		<script src="./js/main.js"></script>
+	</head>
+	<body>
+	<div id="page">
+		<div id="header">
+			<img src="./img/logo-full.png"/>
+			<div>Protocoller</div>
+		</div>
+		<div id="content">
+			<div id="retr_col">
+				<div id="retr_col_header" class="col-header"></div>
+				<div id="create_retr">
+					<a id="new_retr" href><img src="./img/new.png" alt="+"/><span></span></a>
+				</div>
+				<div id="retr_col_content">
+					<table id="retr_list"></table>
+				</div>
+			</div>
+			<div id="prop_col">
+				<div id="prop_col_header" class="col-header"></div>
+				<div id="retr_props"  class="grey">
+					<input id="retr_name" type="text" class="input"/>
+					<select id="retr_type" class="input">
+						<option value="wialon">Wialon</option>
+						<option value="nis">Nis</option>
+						<option value="granit3">Granit Navigator</option>
+						<option value="skaut">Skaut</option>
+						<option value="cyber_glx">Cyber GLX</option>
+						<option value="wialon_ips">Wialon IPS</option>
+						<option value="vt300">VT 300</option>
+						<option value="egts">EGTS</option>
+						<option value="soap">SOAP</option>
+						<option value="nvg">NVG</option>
+						<option value="rtti">RTTI</option>
+					</select>
+					<div>
+						<input id="retr_server" name="server" class="input retr-server" type="text"/>
+						<input id="retr_port" name="port" class="input" type="text"/>
+					</div>
+					<input id="retr_auth" type="text" name="auth" class="input"/>
+					<input id="retr_login" type="text" name="login" class="input"/>
+					<input id="retr_pass" type="text" name="password" class="input"/>
+					<div id="retr_ssl_block"><input type="checkbox" id="retr_ssl" name="ssl" class="checkbox"/><label for="retr_ssl"></label></div>
+					<div id="retr_v6type_block"><input type="checkbox" id="retr_v6type" name="v6type" class="checkbox"/><label for="retr_v6type"></label></div>
+					<div id="retr_notauth_block"><input type="checkbox" id="retr_notauth" name="notauth" class="checkbox"/><label for="retr_notauth"></label></div>
+				</div>
+				<div id="prop_col_content" class="grey">
+					<table id="retr_units_list"></table>
+				</div>
+				<div id="retr_buttons">
+					<a id="retr_cancel" href></a>
+					<input id="retr_ok" type="button"/>
+				</div>
+			</div>
+			<div id="units_col">
+				<div id="units_col_header" class="col-header"></div>
+				<div id="search_container">
+					<input id="unit_search" type="text" class="input"/>
+				</div>
+				<div id="units_col_content">
+					<table id="units_list"></table>
+				</div>
+			</div>
+		</div>
+	</div>
+	</body>
+</html>
