@@ -6,7 +6,7 @@ Protocoller is an app which enables you to work with retranslators. Retranslatio
 With Protocoller you can easily create, configure and delete retranslators as well as quickly add/remove units for retranslation. Besides, you can reassign units' IDs. At any time a particular retranslator can be started or stopped with one click of a mouse. 
 
 ## License:
-LGPL: http://www.gnu.org/licenses/lgpl.html
+[The MIT License](../master/LICENSE-MIT)
 
 ## Requirements:
  * Browser: Google Chrome 20+, Firefox 15+, Safari 5+, IE 9+, Opera 10+
