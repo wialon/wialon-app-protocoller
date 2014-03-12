@@ -1,4 +1,4 @@
-# Protocoller, version 1.3: (August 21, 2013)
+# Protocoller, version 1.4: (March 14, 2014)
 This is WEB application based on Apps from Gurtam (http://apps.wialon.com).
 
 ## Description:
@@ -29,3 +29,6 @@ More information about retranslators and their configuration: http://docs.gurtam
 
  * v1.3 (August 21, 2013)  
 - Added support of RTTI protocol
+
+ * v1.4 (March 14, 2014)  
+- Fixed errors while saving retranslator

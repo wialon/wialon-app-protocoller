@@ -78,12 +78,12 @@ function loadScript(src, callback) {
 	var script = document.createElement("script");
 	script.setAttribute("type","text/javascript");
 	script.setAttribute("charset","UTF-8");
-	script.setAttribute("src", src);		
-	if (callback && typeof callback === "function") {		
+	script.setAttribute("src", src);
+	if (callback && typeof callback === "function") {
 		var id = wrapCallback(callback);
 		if (ie()) {
 			script.onreadystatechange = function () {
-				if (this.readyState === 'complete' || this.readyState == 'loaded') {					
+				if (this.readyState === 'complete' || this.readyState == 'loaded') {
 					callback();
 				}
 			};
@@ -111,7 +111,7 @@ function initSdk () {
 }
 
 /// Initialize
-$(document).ready(function () {		
+$(document).ready(function () {	
 	var url = getUrlParameter("baseUrl");
 	if (!url) 
 		url = getUrlParameter("hostUrl");
@@ -121,11 +121,11 @@ $(document).ready(function () {
 	
 	LANG = getUrlParameter("lang");
 	if ((!LANG) || ($.inArray(LANG, ["en", "ru"]) == -1))
-		LANG = "en";		
+		LANG = "en";
 	$.localise('lang/', {language: LANG});
 	
-	initControls();		
-	loadScript(url, initSdk);		
+	initControls();
+	loadScript(url, initSdk);
 });
 
 /// Login 
@@ -147,9 +147,9 @@ function login(code) {
 function initControls() {
 	
 	// IE style fix
-	if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1) {	
+	if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1) {
 		$("#retr_col_content").width(parseInt($("#retr_col").width())+16);
-		$("#prop_col_content").width(parseInt($("#prop_col").width())+15);		
+		$("#prop_col_content").width(parseInt($("#prop_col").width())+15);
 	}
 	
 	$(window).resize( function() {searchUnits();});
@@ -158,7 +158,7 @@ function initControls() {
 	$("#prop_col_header").html($.localise.tr("Retranslator properties"));
 	$("#units_col_header").html($.localise.tr("All units"));
 	$("#new_retr span").append($.localise.tr("New retranslator"));
-	$("#retr_cancel").html($.localise.tr("Cancel"));	
+	$("#retr_cancel").html($.localise.tr("Cancel"));
 	$("#retr_ok").val($.localise.tr("OK"));
 	
 	jQuery("#retr_name").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Name");}});
@@ -174,11 +174,11 @@ function initControls() {
 		
 	$("#retr_type").change(function (e){
 		$("#retr_props input[type=text]:gt(0)").val("");
-		$("#retr_props input[type=checkbox]").attr("checked", false);		
+		$("#retr_props input[type=checkbox]").attr("checked", false);
 		
-		var retrType = e.currentTarget.value;				
+		var retrType = e.currentTarget.value;
 		if (retrType == "wialon" || retrType == "skaut" || retrType == "cyber_glx" || retrType == "vt300" || retrType == "nvg") {
-			$("#retr_server").attr("class","input retr-server");			
+			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port").css("display","inline-block").val();
 			$("#retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
 		} else if (retrType == "nis") {
@@ -207,42 +207,42 @@ function initControls() {
 			$("#retr_login, #retr_pass").css("display","inline-block");
 			$("#retr_port, #retr_auth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
 		} 
-				
+		
 		$("#retr_port").val(defaultPort(retrType));
 		
-		$("#prop_col_content").css("top",$("#prop_col_header").height()+$("#retr_props").height()+15);		
+		$("#prop_col_content").css("top",$("#prop_col_header").height()+$("#retr_props").height()+15);
 	});	
 	
 	$("#new_retr").click(function() {
 		saveOrNot();
 		
 		$(this).attr("new","new");
-		clearRetrProperties();		
+		clearRetrProperties();
 		curRetranslator = null;
 		$("#retr_name").val($.localise.tr("New retranslator")).select().focus();
 		
 		var selRow = $("tr[id^=retr_][class=grey]")[0];	
-		var cells = $(selRow).children();	
+		var cells = $(selRow).children();
 		if(cells.length == 4) {
 			$(cells[1]).attr("colspan",2);
 			$(cells[2]).remove();
 		}	
-		$(selRow).removeClass();		
+		$(selRow).removeClass();
 		
 		return false;
 	});
 	$("#retr_name").keyup(function() {
-		var regexp = /([\"\{\}\\])/i;		
+		var regexp = /([\"\{\}\\])/i;
 		if(this.value && this.value.length>=4 && this.value.length<=50 && this.value[0]!=" " && this.value[this.value.length-1]!=" " && !regexp.test(this.value))
 			$("#retr_ok").attr("disabled",false);
 		else
 			$("#retr_ok").attr("disabled",true);
 	});
 	$("#retr_ok").click(updateRetranslator);
- 	$("#retr_cancel").click(function() {		
+ 	$("#retr_cancel").click(function() {
 		cancelPressed = true;
 		if (curRetranslator)
-			$("tr[id=retr_"+curRetranslator.getId()+"]").click();	
+			$("tr[id=retr_"+curRetranslator.getId()+"]").click();
 		else {
 			clearRetrProperties();
 			$("#retr_name").val($.localise.tr("New retranslator")).select().focus();
@@ -254,43 +254,43 @@ function initControls() {
 
 
 /// Init wialon event system 
-function initEnvironment() {		
+function initEnvironment() {
 	/// retranslator data flags
 	RETR_FLAGS = wialon.item.Item.dataFlag.base|wialon.item.Retranslator.dataFlag.state|wialon.item.Retranslator.dataFlag.units;
 	/// unit data flags
 	UNIT_FLAGS = wialon.item.Item.dataFlag.base|wialon.item.Unit.dataFlag.restricted|wialon.item.Item.dataFlag.image;
 	// load library for working with unit icons
-	wialon.core.Session.getInstance().loadLibrary("itemIcon");	
+	wialon.core.Session.getInstance().loadLibrary("itemIcon");
 	// init wialon event system
 	var spec = [{type: "type", 
 			data: "avl_retranslator", 
 			flags: RETR_FLAGS, 
-			mode: 0}];	
+			mode: 0}];
 	wialon.core.Session.getInstance().updateDataFlags(spec, function(code) {
 		if(code) {
 			alert("Error ["+ code +"]: " + wialon.core.Errors.getErrorText(code));
 			return;
-		}		
+		}
 		showRetranslators();
 	});	
 	
 	var spec = [{type: "type", 
 			data: "avl_unit", 
 			flags: UNIT_FLAGS, 
-			mode: 0}];	
+			mode: 0}];
 	wialon.core.Session.getInstance().updateDataFlags(spec, function(code) {
 		if(code) {
 			alert("Error ["+ code +"]: " + wialon.core.Errors.getErrorText(code));
 			return;
-		}		
-		searchUnits();				
+		}
+		searchUnits();
 		$("#unit_search").keyup(function(e) {
 			// ignore keys
 			if (e.which == 37 || e.which == 38 || e.which == 39 || e.which == 40)
-				return;		
-			clearTimeout(timeoutId);		
-			timeoutId = window.setTimeout(searchUnits, 500);	
-		});		
+				return;	
+			clearTimeout(timeoutId);
+			timeoutId = window.setTimeout(searchUnits, 500);
+		});
 		$("#retr_list tr:eq(0)").click();
 	});
 }
@@ -312,47 +312,47 @@ function showRetranslators() {
 	
 	// populate table
 	for(var i=0;i<retranslators.length;i++) 
-		addRetrRow(retranslators[i]);	
+		addRetrRow(retranslators[i]);
 }
 
 /// On retranslator click event handler
 function onRetrClick(e) {
-	var targetRow = this;		
-	var prevRow = $("tr[id^=retr_][class=grey]")[0];	
+	var targetRow = this;
+	var prevRow = $("tr[id^=retr_][class=grey]")[0];
 		
 	if(!(cancelPressed || wasDeleted || wasCreated)) {
 		if(targetRow == prevRow) 
-				return;			
-		saveOrNot();	
+				return;	
+		saveOrNot();
 	}
 	cancelPressed = wasDeleted = wasCreated = false;
 	$("#retr_ok").attr("disabled",false);
 	
-	var preCells = $(prevRow).children();	
+	var preCells = $(prevRow).children();
 	if(preCells.length == 4) {
 		$(preCells[1]).attr("colspan",2);
 		$(preCells[2]).remove();
-	}	
+	}
 	$(prevRow).removeClass();
 	if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1)
 		$(".retr-col2 div",prevRow).width(parseInt($(".retr-col2",prevRow).css("max-width"))+22)
-		
+	
 	$(targetRow).addClass("grey");
 	clearRetrProperties();
 	var cells = $(targetRow).children();
-		
+	
 	var retrId = targetRow.id.substring(5);	
 	wialon.core.Session.getInstance().searchItem(retrId, RETR_FLAGS, function(code, item) {
 		if (code)
 			return;
 		
-		curRetranslator = item;		
+		curRetranslator = item;	
 				
 		if (curRetranslator.getUserAccess() & wialon.item.Item.accessFlag.deleteItem) {
 			$(cells[1]).attr("colspan",1);
 			$(cells[2]).clone().appendTo(targetRow);
 			$("td:eq(3) img",targetRow).click(onOperateRetranslator);
-			$(cells[2]).html("<img src='"+DEL_IMG+"'/>").addClass("retr-col3");			
+			$(cells[2]).html("<img src='"+DEL_IMG+"'/>").addClass("retr-col3");
 			$("img[src*='del']",targetRow).click(onDeleteRetranslator);
 			if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1)
 				$(".retr-col2 div",targetRow).width(parseInt($(".retr-col2",targetRow).css("max-width"))-2);
@@ -368,10 +368,10 @@ function onRetrClick(e) {
 		$("#retr_pass").val(config.password);
 		document.getElementById("retr_ssl").checked = parseInt(config.ssl);
 		document.getElementById("retr_v6type").checked = parseInt(config.v6type);
-		document.getElementById("retr_notauth").checked = parseInt(config.notauth);			
+		document.getElementById("retr_notauth").checked = parseInt(config.notauth);
 		
-		if (curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editSettings)  {		
-			var retrUnits = curRetranslator.getUnits();			
+		if (curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editSettings)  {
+			var retrUnits = curRetranslator.getUnits();
 			var retrUnitsFull = [];
 			for( var i=0; i<retrUnits.length; i++) {
 				var unit = wialon.core.Session.getInstance().getItem(retrUnits[i].i);
@@ -380,7 +380,7 @@ function onRetrClick(e) {
 					unit.st = retrUnits[i].st;
 					retrUnitsFull.push(unit);
 				}
-			}		
+			}
 			wialon.util.Helper.sortItems(retrUnitsFull);
 			for( var i=0; i<retrUnitsFull.length; i++) {
 				var retrUnit = retrUnitsFull[i];
@@ -389,8 +389,8 @@ function onRetrClick(e) {
 				if (unitCheckbox)
 					unitCheckbox.checked = true;
 				$("#unit_name_"+id).addClass("grey-text");
-				addRetrUnitRow(retrUnit);			
-			}					
+				addRetrUnitRow(retrUnit);
+			}
 			
 			if (!(curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editUnits)) 
 				$(".uniqueid-textfield, #units_list input").attr("disabled",true);
@@ -408,33 +408,33 @@ function onRetrClick(e) {
 /// Save changes in retranslator
 function updateRetranslator() {	
 	
-	var name = $("#retr_name").val();	
-	var config = getRetrConfig();		
+	var name = $("#retr_name").val();
+	var config = getRetrConfig();
 	var units = getRetrUnits();
 			
 	if(curRetranslator) {
 		if(name != curRetranslator.getName()) 
-			curRetranslator.updateName(name, function(code) {				
-				if (code) 					
-					alert(sprintf($.localise.tr("Error editing name of retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));					
+			curRetranslator.updateName(name, function(code) {
+				if (code)
+					alert(sprintf($.localise.tr("Error editing name of retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));
 			});	
 		
-		var oldConfig = curRetranslator.getConfig();	
+		var oldConfig = curRetranslator.getConfig();
 		config.debug = oldConfig.debug=="1"?"1":"0";
-		if(!wialon.util.Helper.objectsEqual(oldConfig,config)) {			
-			curRetranslator.updateConfig(config, function(code) {					
-				if (code) 					
-					alert(sprintf($.localise.tr("Error editing configuration of retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));						
+		if(!wialon.util.Helper.objectsEqual(oldConfig,config)) {
+			curRetranslator.updateConfig(config, function(code) {
+				if (code)
+					alert(sprintf($.localise.tr("Error editing configuration of retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));
 			});
 		}
 				
 		if(needUpdateRetrUnits)
-			curRetranslator.updateUnits(units, function(code) {				
-				if (code) 					
-					alert(sprintf($.localise.tr("Error adding units to retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));				
-			});	
+			curRetranslator.updateUnits(units, function(code) {
+				if (code)
+					alert(sprintf($.localise.tr("Error adding units to retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));
+			});
 		needUpdateRetrUnits = false;
-		//var top = $("#retr_"+curRetranslator.getId()).position().top;				
+		//var top = $("#retr_"+curRetranslator.getId()).position().top;
 		//$("#retr_col_content").animate({scrollTop:top},"slow");
 	}
 	else {
@@ -442,10 +442,10 @@ function updateRetranslator() {
 		if (!user || !(user.getUserFlags() & wialon.item.User.userFlag.canCreateItems))
 			return false;
 			
-		config.debug = "0";		
-		wialon.core.Session.getInstance().createRetranslator(user, name, config, RETR_FLAGS, function(code, retr) {			
-			if (code) {					
-				alert(sprintf($.localise.tr("Error creating retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));				
+		config.debug = "0";
+		wialon.core.Session.getInstance().createRetranslator(user, name, config, RETR_FLAGS, function(code, retr) {
+			if (code) {
+				alert(sprintf($.localise.tr("Error creating retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));
 				return;
 			}
 			needUpdateRetrUnits = false;
@@ -453,13 +453,13 @@ function updateRetranslator() {
 			var spec = [{type: "id", 
 					data: retr.getId(), 
 					flags: 0xffffff, 
-					mode: 1}];	
-			wialon.core.Session.getInstance().updateDataFlags(spec, function(code) {				
+					mode: 1}];
+			wialon.core.Session.getInstance().updateDataFlags(spec, function(code) {
 				if (code)
 					return;
 				var newRetr = wialon.core.Session.getInstance().getItem(retr.getId());
-				newRetr.updateUnits(units, function(code) {					
-					if (code) 					
+				newRetr.updateUnits(units, function(code) {
+					if (code)
 						alert(sprintf($.localise.tr("Error adding units to retranslator '%s': %s."),name,wialon.core.Errors.getErrorText(code)));	
 					curRetranslator = newRetr;
 					addRetrRow(newRetr);
@@ -483,7 +483,7 @@ function getRetrConfig() {
 			config[pName] = jQuery(this).val();
 		else
 			config[pName] = (this.checked ? "1" : "0");
-	});	
+	});
 	return config;
 }
 
@@ -495,7 +495,7 @@ function getRetrUnits() {
 			i: parseInt(this.id.substring(10)),
 			a:  $("input",this).val(),
 			st: parseInt($(this).attr("st"))
-		});			
+		});
 	});
 	return units;
 }
@@ -507,7 +507,7 @@ function saveOrNot() {
 	
 	if(!curRetranslator)  {
 		if($("#new_retr").attr("new"))
-			needUpdate = true;	
+			needUpdate = true;
 	}
 	else {
 		var name = $("#retr_name").val();
@@ -515,18 +515,24 @@ function saveOrNot() {
 		var oldConfig = curRetranslator.getConfig();
 		oldConfig.debug = oldConfig.debug=="1"?"1":"0";
 		config.debug = oldConfig.debug;
+		var configs_equal = true;
+		for (var i in config)
+			if (config[i] != oldConfig[i]) {
+				configs_equal = false;
+				break;
+			}
 		
-		if(name != curRetranslator.getName() || !wialon.util.Helper.objectsEqual(oldConfig,config) || needUpdateRetrUnits)
-			needUpdate =  true;			
+		if(name != curRetranslator.getName() || !configs_equal || needUpdateRetrUnits)
+			needUpdate =  true;
 	}
 	
-	if (needUpdate) {	
+	if (needUpdate) {
 		if(curRetranslator) {
 			if(confirm(sprintf($.localise.tr("Do you want to save changes in retranslator '%s'?"),curRetranslator.getName()))) {
 				if ($("#retr_ok")[0].disabled == true)
 					alert($.localise.tr("Changes cannot be applied: invalid name."));
 				else
-					$("#retr_ok").click();	
+					$("#retr_ok").click();
 			}
 		}
 		else {
@@ -534,44 +540,44 @@ function saveOrNot() {
 				if ($("#retr_ok")[0].disabled == true)
 					alert($.localise.tr("Changes cannot be applied: invalid name."));
 				else
-					$("#retr_ok").click();	
+					$("#retr_ok").click();
 			}
 		}
 	}
-	needUpdateRetrUnits = false;	
+	needUpdateRetrUnits = false;
 }
 
 /// On delete retranslator event handler
-function onDeleteRetranslator(e) {	
+function onDeleteRetranslator(e) {
 	var id = this.parentNode.parentNode.id.substring(5);
 	var retr = wialon.core.Session.getInstance().getItem(id);
 	var retrName = retr.getName();
 	
-	if (confirm(sprintf($.localise.tr("Do you really want to delete retranslator '%s'?"),retrName))) {	
+	if (confirm(sprintf($.localise.tr("Do you really want to delete retranslator '%s'?"),retrName))) {
 		wialon.core.Session.getInstance().deleteItem(retr, function(code) {
-			if (code) 					
-				alert(sprinf($.localise.tr("Error deleting retranslator '%s': %s."),retrName,wialon.core.Errors.getErrorText(code)));			
-		});			
+			if (code)
+				alert(sprinf($.localise.tr("Error deleting retranslator '%s': %s."),retrName,wialon.core.Errors.getErrorText(code)));
+		});
 	}	
 	e.stopPropagation();
 }
 
 /// On operate icon click event handler
 function onOperateRetranslator(e) {
-	var row = e.currentTarget.parentNode.parentNode;	
+	var row = e.currentTarget.parentNode.parentNode;
 	var retranslator = wialon.core.Session.getInstance().getItem(row.id.substring(5));
 	
-	retranslator.updateOperating($(this).attr("src").search("pause")!=-1?false:true, function(code) {		
+	retranslator.updateOperating($(this).attr("src").search("pause")!=-1?false:true, function(code) {
 		if(code)
-			alert(sprintf($.localise.tr("Retranslator '%s' can't be started or stopped."),retranslator.getName()));			
+			alert(sprintf($.localise.tr("Retranslator '%s' can't be started or stopped."),retranslator.getName()));
 	});
 	e.stopPropagation();
 }
 
 /// Search units
-function searchUnits() {	
+function searchUnits() {
 	var phrase = $("#unit_search").val();
-	phrase = (phrase == "") ? "*": "*" + phrase + "*";	
+	phrase = (phrase == "") ? "*": "*" + phrase + "*";
 	
 	var spec = { itemsType: "avl_unit", 
 			propName: "sys_name", 
@@ -580,17 +586,17 @@ function searchUnits() {
 	
 	wialon.core.Session.getInstance().searchItems(spec, 0, UNIT_FLAGS, 0, 0, function(code, data) {
 		$("#units_list").html("");
-		if (code || !data) 			
+		if (code || !data)
 			return;
 		
-		var width =  $(window).outerWidth()-$("#retr_col").outerWidth()-$("#prop_col").outerWidth()-35;		
-		var unitsInARow = Math.floor(width/250);		
+		var width =  $(window).outerWidth()-$("#retr_col").outerWidth()-$("#prop_col").outerWidth()-35;
+		var unitsInARow = Math.floor(width/250);
 		if (!unitsInARow || unitsInARow < 0)
 			unitsInARow = 1;
 		
 		var units = data.items;
-		for(var i=0;i<units.length;i=i+unitsInARow) {			
-			var unit = data.items[i];			
+		for(var i=0;i<units.length;i=i+unitsInARow) {
+			var unit = data.items[i];
 			// check access
 			if (!wialon.util.Number.and(unit.getUserAccess(), wialon.item.Unit.accessFlag.monitorState))
 				continue;
@@ -598,7 +604,7 @@ function searchUnits() {
 		}
 		
 		$("tr[id^=retr_unit_]").each(function() {
-			var id = this.id.substring(10);			
+			var id = this.id.substring(10);
 			var unitCheckbox = $("#unit_check_"+id)[0];
 			if (unitCheckbox)
 				unitCheckbox.checked = true;
@@ -618,7 +624,7 @@ function addRetrUnitRow(retrUnit) {
 		return;
 	
 	if(!retrUnit.a)
-		retrUnit.a = retrUnit.getUniqueId();		
+		retrUnit.a = retrUnit.getUniqueId();
 	if(!retrUnit.st)
 		retrUnit.st = 0;
 	
@@ -629,9 +635,9 @@ function addRetrUnitRow(retrUnit) {
 	
 	
 	$("input",row).change(function() {needUpdateRetrUnits = true;});
-	$("input",row).attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Unique ID");}});	
+	$("input",row).attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Unique ID");}});
 	
-	$("#retr_units_list").append(row);	
+	$("#retr_units_list").append(row);
 	
 	if(!curRetranslator || (curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editUnits)) {	
 		var showDelButton = function() {
@@ -652,7 +658,7 @@ function addRetrUnitRow(retrUnit) {
 			$(".unit-col2 div",this).width(parseInt($(".unit-col2",this).css("max-width"))+22);
 			$("img[src*='del']",this).click(function() {return false;});
 		};			
-		row.hover(showDelButton,hideDelButton);		
+		row.hover(showDelButton,hideDelButton);
 		
 		if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1)
 			row.mouseleave(hideDelButton);
@@ -664,10 +670,10 @@ function addRetrUnitRow(retrUnit) {
 
 /// Clear properties in middle column
 function clearRetrProperties() {
-	$("#retr_type").val("wialon").change();		
-	$("#retr_props input[type=text]").val("");	
+	$("#retr_type").val("wialon").change();
+	$("#retr_props input[type=text]").val("");
 	$("#retr_props input[type=checkbox]").attr("checked", false);
-	$("#retr_props input, #retr_props select").attr("disabled",false);	
+	$("#retr_props input, #retr_props select").attr("disabled",false);
 	$(".uniqueid-textfield, #units_list input").attr("disabled",false);
 	$("#retr_port").val(defaultPort("wialon"));
 	if($("#retr_buttons").css("display") == "none") {
@@ -685,7 +691,7 @@ function addRetrRow(retr) {
 	if (!retr)
 		return;	
 	
-	var id = retr.getId();		
+	var id = retr.getId();
 	
 	var operating = retr.getOperating();
 	var stateImg = operating ? "<img src='"+ACTIVE_IMG+"'/>" : "<img src='"+STOPPED_IMG+"'/>";
@@ -697,12 +703,12 @@ function addRetrRow(retr) {
 			+"</td><td colspan=2 class='retr-col2'><div>"+retr.getName()+"</div></td>"
 			+"<td>"+(canOperate?operating:"")+"</td></tr>";
 			
-	var row = $(html);	
+	var row = $(html);
 		
 	row.click(onRetrClick);
 	$("img[src*=play], img[src*=pause]",row).click(onOperateRetranslator);
 	
-	$("#retr_list").append(row);	
+	$("#retr_list").append(row);
 	if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1) 
 		$(".retr-col2 div",row).width(parseInt($(".retr-col2",row).css("max-width"))+22);
 	
@@ -714,7 +720,7 @@ function addUnitRow(units, from, unitsInARow) {
 	if (!units)
 		return;
 	
-	var html = "<tr>";	
+	var html = "<tr>";
 	for (var i=from;i<from+unitsInARow; i++) {
 		if (!units[i])
 			break;
@@ -722,21 +728,21 @@ function addUnitRow(units, from, unitsInARow) {
 		html += "<td><input type='checkbox' id='unit_check_"+id+"'/></td>"
 		+ "<td><img src='" + units[i].getIconUrl(24) + "'/></td>"
 		+ "<td class='units-column' id='unit_name_"+id+"'><div>" + units[i].getName() + "</div></td>";	
-	}		
+	}
 	html += "</tr>";
-	var row = $(html);	
+	var row = $(html);
 	
-	$("input",row).click(function(e) {		
-		needUpdateRetrUnits = true;		
-		var unitId = this.id.substring(11);		
+	$("input",row).click(function(e) {
+		needUpdateRetrUnits = true;
+		var unitId = this.id.substring(11);
 		if (this.checked) {
 			var unit = wialon.core.Session.getInstance().getItem(unitId);
 			addRetrUnitRow(unit);
-			$("#unit_name_"+unitId).addClass("grey-text");		
+			$("#unit_name_"+unitId).addClass("grey-text");
 		}
 		else {
 			$("#retr_unit_"+unitId).remove();
-			$("#unit_name_"+unitId).removeClass("grey-text");						
+			$("#unit_name_"+unitId).removeClass("grey-text");
 		}
 	});
 	
@@ -762,19 +768,19 @@ function addRetrListener(retr) {
 }
 
 /// Redraw retranslator info according to event catched
-function redrawRetr(e) {	
-	var retr = e.getTarget();	
+function redrawRetr(e) {
+	var retr = e.getTarget();
 	var type = e.getType();
 	var id = retr.getId();
-	var row = $("#retr_" + id);	
+	var row = $("#retr_" + id);
 	if (type == "changeName") {
-		$("td:eq(1) div",row).html(retr.getName());				
-	} else if (type == "changeOperating") {		
+		$("td:eq(1) div",row).html(retr.getName());
+	} else if (type == "changeOperating") {
 		var operating = retr.getOperating();
 		var state = operating ? ACTIVE_IMG : STOPPED_IMG;
 		operating = operating ? PAUSE_IMG : PLAY_IMG;
 		$("td:last img",row).attr("src",operating);
-		$("td:first img",row).attr("src",state);	
+		$("td:first img",row).attr("src",state);
 	} else if (type == "itemDeleted") {
 		wasDeleted = true;
 		var nextRow = $("+ tr",row)[0];	
@@ -782,7 +788,7 @@ function redrawRetr(e) {
 			$(nextRow).click();
 		else
 			$("#retr_list tr:eq(0)").click();
-		$(row).remove();		
+		$(row).remove();
 	}
 }
 
