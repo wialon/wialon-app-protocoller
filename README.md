@@ -1,4 +1,4 @@
-# Protocoller, version 1.4: (March 14, 2014)
+# Protocoller, version 1.5: (May 13, 2014)
 This is WEB application based on Apps from Gurtam (http://apps.wialon.com).
 
 ## Description:
@@ -24,11 +24,17 @@ More information about retranslators and their configuration: http://docs.gurtam
 - initial release
 
  * v1.2 (July 10, 2013)  
-- Modified list of available units: several columns instead of one
-- Added support of NVG protocol
+- modified list of available units: several columns instead of one
+- added support of NVG protocol
 
  * v1.3 (August 21, 2013)  
-- Added support of RTTI protocol
+- added support of RTTI protocol
 
  * v1.4 (March 14, 2014)  
-- Fixed errors while saving retranslator
+- fixed errors while saving retranslator
+
+ * v1.5 (May 13, 2014)
+- fixed protocol options switching
+- fixed crash when retranslator service is not available
+- Scout protocol: add option scoutOpen
+- added TransNavi protocol

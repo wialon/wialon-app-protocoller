@@ -29,12 +29,13 @@ function defaultPort(protocol) {
 	switch (protocol) {
  		case "wialon": return 20163;
 		case "granit3": return 20121;
-		case "skaut": return 20117;
+		case "skaut": return document.getElementById("retr_scoutOpen").checked ? 20654 : 20117;
 		case "cyber_glx": return 20185;
 		case "wialon_ips": return 20332;
 		case "vt300": return 20180;
 		case "egts": return 20629;
 		case "soap": return 80;
+		case "trn": return 4880;
 		case "nvg": return 8416;
 		default: return 0;
 	}
@@ -171,47 +172,64 @@ function initControls() {
 	$("[for=retr_ssl]").html($.localise.tr("Secure connection"));
 	$("[for=retr_v6type]").html($.localise.tr("Protocol v.6"));
 	$("[for=retr_notauth]").html($.localise.tr("Disable authorization"));
-		
+	$("#retr_scoutOpen_block").find("label[for=retr_scoutOpen]").html($.localise.tr("ScoutOpen protocol"));
+	$("#retr_binauth_block").find("label[for=retr_binauth]").html($.localise.tr("Binary auth"));
+	
+	$("#retr_scoutOpen").change(function(){
+		$("#retr_port").val(
+			defaultPort( $("#retr_type").val() )
+		);
+	});
+
 	$("#retr_type").change(function (e){
 		$("#retr_props input[type=text]:gt(0)").val("");
 		$("#retr_props input[type=checkbox]").attr("checked", false);
 		
 		var retrType = e.currentTarget.value;
-		if (retrType == "wialon" || retrType == "skaut" || retrType == "cyber_glx" || retrType == "vt300" || retrType == "nvg") {
+		if (retrType == "wialon" || retrType == "cyber_glx" || retrType == "vt300" || retrType == "nvg") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port").css("display","inline-block").val();
-			$("#retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+		} else if (retrType == "skaut") {
+			$("#retr_server").attr("class","input retr-server");
+			$("#retr_port").css("display","inline-block").val();
+			$("#retr_scoutOpen_block").css("display","inline-block");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
 		} else if (retrType == "nis") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_auth, #retr_ssl_block").css("display","inline-block");
-			$("#retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "rtti") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_auth").css("display","inline-block");
-			$("#retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "granit3") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_v6type_block").css("display","inline-block");
-			$("#retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "wialon_ips") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_auth").css("display","inline-block");
-			$("#retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "egts") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_notauth_block").css("display","inline-block");
-			$("#retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_scoutOpen_block").css("display","none");
 			$("#prop_col_content").attr("class","grey prop-col-content2");
 		} else if (retrType == "soap") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_login, #retr_pass").css("display","inline-block");
-			$("#retr_port, #retr_auth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
-		} 
+			$("#retr_binauth_block, #retr_port, #retr_auth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+		} else if (retrType == "trn") {
+			$("#retr_server").attr("class","input retr-server");
+			$("#retr_port, #retr_auth, #retr_binauth_block").css("display","inline-block");
+			$("#retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+		}
 		
 		$("#retr_port").val(defaultPort(retrType));
 		
 		$("#prop_col_content").css("top",$("#prop_col_header").height()+$("#retr_props").height()+15);
-	});	
+	}).change();	
 	
 	$("#new_retr").click(function() {
 		saveOrNot();
@@ -369,6 +387,8 @@ function onRetrClick(e) {
 		document.getElementById("retr_ssl").checked = parseInt(config.ssl);
 		document.getElementById("retr_v6type").checked = parseInt(config.v6type);
 		document.getElementById("retr_notauth").checked = parseInt(config.notauth);
+		document.getElementById("retr_scoutOpen").checked = parseInt(config.scoutOpen);
+		document.getElementById("retr_binauth").checked = parseInt(config.binauth);
 		
 		if (curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editSettings)  {
 			var retrUnits = curRetranslator.getUnits();
@@ -406,7 +426,11 @@ function onRetrClick(e) {
 }
 
 /// Save changes in retranslator
-function updateRetranslator() {	
+function updateRetranslator() {
+	if (typeof UNIT_FLAGS === 'undefined') {
+		alert($.localise.tr("Retranslation service is not activated in your account. Please, contact your service administrator for details."));
+		return;
+	}
 	
 	var name = $("#retr_name").val();
 	var config = getRetrConfig();
@@ -576,6 +600,10 @@ function onOperateRetranslator(e) {
 
 /// Search units
 function searchUnits() {
+	if (typeof UNIT_FLAGS === 'undefined') {
+		return;
+	}
+	
 	var phrase = $("#unit_search").val();
 	phrase = (phrase == "") ? "*": "*" + phrase + "*";
 	

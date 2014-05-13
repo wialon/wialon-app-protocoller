@@ -2,7 +2,7 @@
 	"name": "protocoller",
 	"url_name": "protocoller",
 	"title": "Protocoller",
-	"description": "App which enables you to work with retranslators",
+	"description": "App which enables you to work with retranslators.",
 	"author": {
 		"name": "",
 		"url": "http://gurtam.com"
@@ -37,9 +37,9 @@
 		"en",
 		"ru"
 	],
-	"build_date": "2014-03-12",
+	"build_date": "2014-05-13",
 	"release_date": "2013-06-20",
-	"version": "1.4",
+	"version": "1.5",
 	"keywords": [
 		"wialon",
 		"wialon-apps",

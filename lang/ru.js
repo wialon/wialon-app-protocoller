@@ -1,4 +1,6 @@
 TRANSLATIONS = {
+	"Binary auth": "Бинарная авторизация",
+
 	"Retranslator": "Ретранслятор",
 
 	"Retranslator properties": "Свойства ретранслятора",
@@ -18,6 +20,8 @@ TRANSLATIONS = {
 	"Auth": "Авторизация",
 	
 	"Secure connection": "Безопасное соединение",
+
+	"ScoutOpen protocol" : "Протокол ScoutOpen",
 	
 	"Protocol v.6": "Протокол v.6",
 	
