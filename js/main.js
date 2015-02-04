@@ -23,6 +23,8 @@ var wasDeleted = false;
 var wasCreated = false;
 /// id for search timeout
 var timeoutId = 0;
+/// format of date and time
+var DATE_TIME_FORMAT = 'd.m.Y H:i';
 
 /// indicate default port
 function defaultPort(protocol) {
@@ -104,11 +106,16 @@ function initSdk () {
 	if (!url) {
 		return null;
 	}
-	var user = getUrlParameter("user");
-	if(!user)
-		return null;
+
 	wialon.core.Session.getInstance().initSession(url);
-	wialon.core.Session.getInstance().duplicate(getUrlParameter("sid"), user, true, login);
+	var user = getUrlParameter("user") || "";
+	var sid = getUrlParameter("sid");
+	var authHash = getUrlParameter("authHash");
+	if (authHash) {
+		wialon.core.Session.getInstance().loginAuthHash(authHash, login);
+	} else if (sid) {
+		wialon.core.Session.getInstance().duplicate(sid, user, true, login);
+	}
 }
 
 /// Initialize
@@ -120,11 +127,14 @@ $(document).ready(function () {
 		return null;
 	url += "/wsdk/script/wialon.js";
 	
-	LANG = getUrlParameter("lang");
+	var LANG = getUrlParameter("lang");
 	if ((!LANG) || ($.inArray(LANG, ["en", "ru"]) == -1))
 		LANG = "en";
 	$.localise('lang/', {language: LANG});
 	
+	if (LANG == "ru") {
+		$("#header .help").attr("href", "/docs/ru/protocoller.html");
+	}
 	initControls();
 	loadScript(url, initSdk);
 });
@@ -161,7 +171,8 @@ function initControls() {
 	$("#new_retr span").append($.localise.tr("New retranslator"));
 	$("#retr_cancel").html($.localise.tr("Cancel"));
 	$("#retr_ok").val($.localise.tr("OK"));
-	
+	$(".retr_history_label").text($.localise.tr("Past period"));
+
 	jQuery("#retr_name").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Name");}});
 	jQuery("#retr_type").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Retranslation protocol");}});
 	jQuery("#retr_server").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Server");}});
@@ -169,6 +180,10 @@ function initControls() {
 	jQuery("#retr_auth").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Auth");}});
 	jQuery("#retr_login").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Login");}});
 	jQuery("#retr_pass").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Password");}});	
+	jQuery("#retr_didauth").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Dispatcher ID");}});	
+	jQuery("#retr_hist_from").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("From");}});
+	jQuery("#retr_hist_to").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("To");}});
+	jQuery("#retr_history, .retr_history_label").attr("title", "X").Tooltip({showURL: false, track_children: true, bodyHandler: function(e) {return $.localise.tr("Retransmit past period data");}});
 	$("[for=retr_ssl]").html($.localise.tr("Secure connection"));
 	$("[for=retr_v6type]").html($.localise.tr("Protocol v.6"));
 	$("[for=retr_notauth]").html($.localise.tr("Disable authorization"));
@@ -182,48 +197,48 @@ function initControls() {
 	});
 
 	$("#retr_type").change(function (e){
-		$("#retr_props input[type=text]:gt(0)").val("");
-		$("#retr_props input[type=checkbox]").attr("checked", false);
-		
+		$("#retr_props input[type=text]:gt(0):not(#retr_hist_to, #retr_hist_from)").val("");
+		$("#retr_props input[type=checkbox]:not(#retr_history)").attr("checked", false);
+
 		var retrType = e.currentTarget.value;
 		if (retrType == "wialon" || retrType == "cyber_glx" || retrType == "vt300" || retrType == "nvg") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port").css("display","inline-block").val();
-			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_didauth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "skaut") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port").css("display","inline-block").val();
 			$("#retr_scoutOpen_block").css("display","inline-block");
-			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_didauth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block").css("display","none");
 		} else if (retrType == "nis") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_auth, #retr_ssl_block").css("display","inline-block");
-			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_didauth, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "rtti") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_auth").css("display","inline-block");
-			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_port, #retr_login, #retr_pass, #retr_didauth, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "granit3") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_v6type_block").css("display","inline-block");
-			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_didauth, #retr_ssl_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "wialon_ips") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_auth").css("display","inline-block");
-			$("#retr_binauth_block, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_login, #retr_pass, #retr_didauth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "egts") {
 			$("#retr_server").attr("class","input retr-server");
-			$("#retr_port, #retr_notauth_block").css("display","inline-block");
+			$("#retr_port, #retr_notauth_block, #retr_didauth").css("display","inline-block");
 			$("#retr_binauth_block, #retr_auth, #retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_scoutOpen_block").css("display","none");
 			$("#prop_col_content").attr("class","grey prop-col-content2");
 		} else if (retrType == "soap") {
 			$("#retr_server").attr("class","input retr-server-long");
 			$("#retr_login, #retr_pass").css("display","inline-block");
-			$("#retr_binauth_block, #retr_port, #retr_auth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_binauth_block, #retr_didauth, #retr_port, #retr_auth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		} else if (retrType == "trn") {
 			$("#retr_server").attr("class","input retr-server");
 			$("#retr_port, #retr_auth, #retr_binauth_block").css("display","inline-block");
-			$("#retr_login, #retr_pass, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
+			$("#retr_login, #retr_pass, #retr_didauth, #retr_ssl_block, #retr_v6type_block, #retr_notauth_block, #retr_scoutOpen_block").css("display","none");
 		}
 		
 		$("#retr_port").val(defaultPort(retrType));
@@ -235,6 +250,7 @@ function initControls() {
 		saveOrNot();
 		
 		$(this).attr("new","new");
+		clearHistRetrProperties();
 		clearRetrProperties();
 		curRetranslator = null;
 		$("#retr_name").val($.localise.tr("New retranslator")).select().focus();
@@ -267,14 +283,44 @@ function initControls() {
 			cancelPressed = false;
 		}
 		return false;
-	});	
+	});
+	$('#retr_history').on('click', function() {
+		var isChecked = $(this).prop('checked');
+		$('#retr_hist_action').css('display', isChecked ? 'block' : 'none');
+		$('#retr_hist_from, #retr_hist_to').css('display', isChecked ? '' : 'none');
+		updateRetrColomnHeight();
+	});
+	$('#retr_hist_action').on('click', onOperateRetranslatorHistory);
+
+	var LANG = getUrlParameter("lang");
+	if ((!LANG) || ($.inArray(LANG, ["en", "ru"]) == -1))
+		LANG = "en";
+
+	$('#retr_hist_from').datetimepicker({
+		lang: LANG,
+		format: DATE_TIME_FORMAT,
+		formatDate: 'd.m.Y',
+		formatTime: 'H:i',
+		defaultDate: (new Date()).dateFormat('d.m.Y'),
+		defaultTime: '00:00',
+		roundTime: 'ceil'
+	});
+	$('#retr_hist_to').datetimepicker({
+		lang: LANG,
+		format: DATE_TIME_FORMAT,
+		formatDate: 'd.m.Y',
+		formatTime: 'H:i',
+		defaultDate: (new Date()).dateFormat('d.m.Y'),
+		defaultTime: '23:59',
+		roundTime: 'ceil'
+	});
 }
 
 
 /// Init wialon event system 
 function initEnvironment() {
 	/// retranslator data flags
-	RETR_FLAGS = wialon.item.Item.dataFlag.base|wialon.item.Retranslator.dataFlag.state|wialon.item.Retranslator.dataFlag.units;
+	RETR_FLAGS = wialon.item.Item.dataFlag.base|wialon.item.Retranslator.dataFlag.state|wialon.item.Retranslator.dataFlag.units|wialon.item.Retranslator.accessFlag.viewSettings;
 	/// unit data flags
 	UNIT_FLAGS = wialon.item.Item.dataFlag.base|wialon.item.Unit.dataFlag.restricted|wialon.item.Item.dataFlag.image;
 	// load library for working with unit icons
@@ -290,12 +336,14 @@ function initEnvironment() {
 			return;
 		}
 		showRetranslators();
-	});	
-	
-	var spec = [{type: "type", 
-			data: "avl_unit", 
-			flags: UNIT_FLAGS, 
-			mode: 0}];
+	});
+
+	spec = [{
+		type: "type",
+		data: "avl_unit",
+		flags: UNIT_FLAGS,
+		mode: 0
+	}];
 	wialon.core.Session.getInstance().updateDataFlags(spec, function(code) {
 		if(code) {
 			alert("Error ["+ code +"]: " + wialon.core.Errors.getErrorText(code));
@@ -357,6 +405,7 @@ function onRetrClick(e) {
 	
 	$(targetRow).addClass("grey");
 	clearRetrProperties();
+	clearHistRetrProperties();
 	var cells = $(targetRow).children();
 	
 	var retrId = targetRow.id.substring(5);	
@@ -384,6 +433,7 @@ function onRetrClick(e) {
 		$("#retr_auth").val(config.auth);
 		$("#retr_login").val(config.login);
 		$("#retr_pass").val(config.password);
+		$("#retr_didauth").val(config.didauth);
 		document.getElementById("retr_ssl").checked = parseInt(config.ssl);
 		document.getElementById("retr_v6type").checked = parseInt(config.v6type);
 		document.getElementById("retr_notauth").checked = parseInt(config.notauth);
@@ -411,8 +461,8 @@ function onRetrClick(e) {
 				$("#unit_name_"+id).addClass("grey-text");
 				addRetrUnitRow(retrUnit);
 			}
-			
-			if (!(curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editUnits)) 
+			checkHistoryOperating(curRetranslator);
+			if (!(curRetranslator.getUserAccess() & wialon.item.Retranslator.accessFlag.editUnits))
 				$(".uniqueid-textfield, #units_list input").attr("disabled",true);
 		}
 		else {
@@ -591,11 +641,98 @@ function onOperateRetranslator(e) {
 	var row = e.currentTarget.parentNode.parentNode;
 	var retranslator = wialon.core.Session.getInstance().getItem(row.id.substring(5));
 	
-	retranslator.updateOperating($(this).attr("src").search("pause")!=-1?false:true, function(code) {
-		if(code)
+	retranslator.updateOperating($(this).attr("src").search("pause") != -1 ? false : true, function(code) {
+		if (code) {
 			alert(sprintf($.localise.tr("Retranslator '%s' can't be started or stopped."),retranslator.getName()));
+		}
+		checkHistoryOperating(retranslator);
 	});
 	e.stopPropagation();
+}
+
+function checkHistoryOperating(retranslator) {
+	var isRunning = retranslator.getOperating();
+	if (isRunning) {
+		$('#retr_history').show();
+		$('.retr_history_label').show();
+		retranslator.getStatistics(function(code, stat) {
+			var isHistoryRunning, timeFrom, timeTo;
+			if (!stat || typeof stat != "object") {
+				return false;
+			}
+			isHistoryRunning = !!stat.ru;
+			if (isHistoryRunning) {
+				timeFrom = (new Date(stat.hf * 1000)).dateFormat(DATE_TIME_FORMAT);
+				timeTo   = (new Date(stat.ht * 1000)).dateFormat(DATE_TIME_FORMAT);
+			}
+			$('#retr_hist_from').val(timeFrom).prop('disabled', isHistoryRunning);
+			$('#retr_hist_to').val(timeTo).prop('disabled', isHistoryRunning);
+			$('#retr_hist_action').css('display', isHistoryRunning ? 'inline-block' : 'none').removeClass().addClass(isHistoryRunning ? 'pause' : 'play');
+			$('#retr_history').css('display', isRunning ? 'inline-block' : '').prop('checked', isHistoryRunning);
+			$('#retr_hist_from, #retr_hist_to').css('display', isHistoryRunning ? 'block' : 'none');
+			updateRetrColomnHeight();
+		});
+	} else {
+		$('.retr_history_label').hide();
+		$('#retr_hist_action').css('display', isRunning ? 'inline-block' : 'none').removeClass().addClass(isRunning ? 'play' : 'pause');
+		$('#retr_history').css('display', isRunning ? 'inline-block' : 'none').prop('checked', isRunning);
+		$('#retr_hist_from, #retr_hist_to').css('display', isRunning ? 'block' : 'none').prop('disabled', isRunning);
+		updateRetrColomnHeight();
+	}
+}
+
+/// On operate history
+function onOperateRetranslatorHistory() {
+	var isOperating;
+	curRetranslator = wialon.core.Session.getInstance().getItem(curRetranslator.getId());
+	if (!curRetranslator) {
+		return false;
+	}
+	isOperating = curRetranslator.getOperating();
+	if (!isOperating) {
+		return false;
+	}
+	var timeFrom = $('#retr_hist_from').val();
+	var timeTo = $('#retr_hist_to').val();
+	if (!timeFrom || !timeTo) {
+		alert($.localise.tr("Please check selected interval."));
+		return false;
+	}
+	curRetranslator.getStatistics(function(code, stat) {
+		var operatingParams = {
+			callMode : "history",
+			operate  : undefined,
+			timeFrom : undefined,
+			timeTo   : undefined
+		};
+		var isHistoryRunning, newHistState;
+		if (!stat || typeof stat != "object") {
+			return false;
+		}
+		isHistoryRunning = !!stat.ru;
+		if (!isHistoryRunning) {
+			operatingParams.timeFrom = Date.parseDate(timeFrom, DATE_TIME_FORMAT).getTime() / 1000;
+			operatingParams.timeTo = Date.parseDate(timeTo, DATE_TIME_FORMAT).getTime() / 1000;
+		}
+		operatingParams.operate = newHistState = !isHistoryRunning;
+		curRetranslator.updateOperating(operatingParams, function(code) {
+			if (code) {
+				alert($.localise.tr('Cannot start/stop data retransmission for the previous period.'));
+				return false;
+			}
+			curRetranslator = wialon.core.Session.getInstance().getItem(curRetranslator.getId());
+			$('#retr_hist_action').css('display', newHistState ? 'inline-block' : 'none').removeClass().addClass(newHistState ? 'pause' : 'play');
+			$('#retr_history').css('display', newHistState ? 'inline-block' : '').prop('checked', newHistState);
+			$('#retr_hist_from, #retr_hist_to').css('display', newHistState ? 'block' : 'none').prop('disabled', newHistState);
+			updateRetrColomnHeight();
+
+		});
+	});
+	return false;
+}
+
+function updateRetrColomnHeight() {
+	$("#prop_col_content").css("top",$("#prop_col_header").height()+$("#retr_props").height()+15);
 }
 
 /// Search units
@@ -713,6 +850,14 @@ function clearRetrProperties() {
 	$(".grey-text").removeClass("grey-text");
 	$("#retr_units_list").html("");
 }
+
+function clearHistRetrProperties() {
+	$('#retr_history').prop('checked', false).hide();
+	$('.retr_history_label').hide();
+	$('#retr_hist_action').hide();
+	$('#retr_hist_from, #retr_hist_to').val('').hide();
+}
+
 
 /// Add row to the table of retranslators 
 function addRetrRow(retr) {

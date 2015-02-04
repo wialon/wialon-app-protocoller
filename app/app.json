@@ -33,13 +33,14 @@
 		"Language",
 		"Current user"
 	],
+	"docs": {},
 	"language": [
 		"en",
 		"ru"
 	],
-	"build_date": "2014-05-13",
+	"build_date": "2015-02-04",
 	"release_date": "2013-06-20",
-	"version": "1.5",
+	"version": "1.5.1",
 	"keywords": [
 		"wialon",
 		"wialon-apps",

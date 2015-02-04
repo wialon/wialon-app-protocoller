@@ -1,8 +1,8 @@
-# Protocoller, version 1.5: (May 13, 2014)
+# Protocoller, version 1.5.1: (February 4, 2015)
 This is WEB application based on Apps from Gurtam (http://apps.wialon.com).
 
 ## Description:
-Protocoller is an app which enables you to work with retranslators. Retranslation is used in Wialon Hosting to transmit data (messages from units) to other servers or systems in real-time. Supported protocols are Wialon, Nis, Granit Navigator, Skaut, Cyber GLX, Wialon IPS, VT 300, EGTS, SOAP.  
+Protocoller is an app which enables you to work with retranslators. Retranslation is used in Wialon Hosting to transmit data (messages from units) to other servers or systems in real-time. Supported protocols are Wialon Retranslator, Nis, Granit Navigator, Scout, Cyber GLX, Wialon IPS, VT 300, EGTS, SOAP.  
 With Protocoller you can easily create, configure and delete retranslators as well as quickly add/remove units for retranslation. Besides, you can reassign units' IDs. At any time a particular retranslator can be started or stopped with one click of a mouse. 
 
 ## License:
@@ -38,3 +38,6 @@ More information about retranslators and their configuration: http://docs.gurtam
 - fixed crash when retranslator service is not available
 - Scout protocol: add option scoutOpen
 - added TransNavi protocol
+
+ * v1.5.1 (February 4, 2015)
+- history retransmission supported

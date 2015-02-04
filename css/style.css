@@ -8,6 +8,16 @@ html, body {
      color: #4c4c4c;
 }
 
+.clear {
+	clear: both;
+}
+
+.clearfix:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
 #page {
     min-height: 100%;
     background-color: #fff;
@@ -75,11 +85,17 @@ td img {
 	float: left;
 }
 
-#header div {
+#header #app_name {
 	color: #797c80;
 	margin-top: 7px;
-	margin-left: 150px;
+	margin-left: 15px;
 	font-size: 20px;
+	float:left;
+}
+
+#header .help {
+	float: right;
+	margin: 5px 13px 0;
 }
 
 /*-----------------------Content-------------------------------------------*/
@@ -375,6 +391,37 @@ img[src*=del], img[src*=pause], img[src*=play] {
 #retr_units_list td.unit-col3{
 	padding-right: 10px;
 	vertical-align: top;
+}
+
+#retr_hist_action {
+	width: 10px;
+	height: 16px;
+	float: right;
+}
+
+.play {
+	background: url("../img/play_.png") no-repeat center;
+}
+
+.pause {
+	background: url("../img/pause_.png") no-repeat center;
+}
+
+#retr_hist_from, #retr_hist_to {
+	width: 95px;
+}
+
+#retr_hist_from {
+	float: left;
+}
+
+#retr_hist_to {
+	float: right;
+}
+
+.retr_history_label {
+	display: inline-block;
+	min-width: 150px;
 }
 
 /*-----------------------Units column-------------------------------------------*/

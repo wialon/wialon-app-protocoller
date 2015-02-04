@@ -1,6 +1,8 @@
 TRANSLATIONS = {
 	"Binary auth": "Бинарная авторизация",
 
+	"Dispatcher ID": "ID диспетчера",
+
 	"Retranslator": "Ретранслятор",
 
 	"Retranslator properties": "Свойства ретранслятора",
@@ -57,5 +59,17 @@ TRANSLATIONS = {
 	
 	"Retranslation service is not activated in your account. Please, contact your service administrator for details.": "Для Вашей учетной записи не включена услуга ретрансляции. Пожалуйста, обратитесь к администратору сервиса.",
 	
-	"Changes cannot be applied: invalid name.": "Изменения не могут быть сохранены: неверное имя."
+	"Changes cannot be applied: invalid name.": "Изменения не могут быть сохранены: неверное имя.",
+
+	"Retransmit past period data" : "Ретранслировать данные за прошедший период",
+
+	"From" : "От",
+
+	"To" : "До",
+
+	"Cannot start/stop data retransmission for the previous period." : "Невозможно запустить или остановить ретрансляцию данных за прошедший период.",
+
+	"Past period": "Прошедший период",
+
+	"Please check selected interval." : "Проверьте выбранный интервал."
 };

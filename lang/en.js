@@ -1,6 +1,8 @@
 TRANSLATIONS = {
 	"Binary auth": "",
 
+	"Dispatcher ID": "",
+
 	"Retranslator": "",
 
 	"Retranslator properties": "",
@@ -57,5 +59,17 @@ TRANSLATIONS = {
 	
 	"Retranslation service is not activated in your account. Please, contact your service administrator for details.": "",
 	
-	"Changes cannot be applied: invalid name.": ""
+	"Changes cannot be applied: invalid name.": "",
+
+	"Retransmit past period data" : "",
+
+	"From" : "",
+
+	"To" : "",
+
+	"Cannot start/stop data retransmission for the previous period." : "",
+
+	"Past period": "",
+
+	"Please check selected interval." : ""
 };
