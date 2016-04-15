@@ -23,7 +23,9 @@ var wasDeleted = false;
 var wasCreated = false;
 /// id for search timeout
 var timeoutId = 0;
-/// format of date and time
+/// format of date and time (for working with Wialon SDK)
+var WIALON_DATE_TIME_FORMAT = 'dd.MM.yyyy HH:mm';
+/// format of date and time (for working with javascript Date)
 var DATE_TIME_FORMAT = 'd.m.Y H:i';
 
 /// indicate default port
@@ -63,14 +65,14 @@ function ie() {
 
 /// Fetch varable from 'GET' request
 function getUrlParameter(name) {
-	if (!name)
+	if (!name) {
 		return null;
-	var pairs = decodeURIComponent(document.location.search.substr(1)).split("&");
+	}
+	var pairs = document.location.search.substr(1).split("&");
 	for (var i = 0; i < pairs.length; i++) {
 		var pair = pairs[i].split("=");
-		if (pair[0] == name) {
-			pair.splice(0, 1);
-			return pair.join("=");
+		if (decodeURIComponent(pair[0]) === name) {
+			return decodeURIComponent(pair[1]);
 		}
 	}
 	return null;
@@ -134,37 +136,42 @@ $(document).ready(function () {
 	
 	if (LANG == "ru") {
 		$("#header .help").attr("href", "/docs/ru/protocoller.html");
+		// SOAP -> SOAP (АСУ ОДС) to be same with hosting
+		$("#retr_type option[value=soap]").html("SOAP (АСУ ОДС)");
 	}
 	initControls();
 	loadScript(url, initSdk);
 });
 
-/// Login 
+/// Login
 function login(code) {
 	if (code) {
 		alert("Login error.");
 		return;
-	}	
+	}
+
 	wialon.core.Session.getInstance().getAccountData(true, function (code, data) {
-			if (code === 0 && data.settings && data.settings.combined &&
-				data.settings.combined.services && data.settings.combined.services.avl_retranslator && data.settings.combined.services.avl_retranslator.cost!=-1)
+			if ((code === 0 && data.settings && data.settings.combined &&
+				data.settings.combined.services && data.settings.combined.services.avl_retranslator &&
+				data.settings.combined.services.avl_retranslator.cost!=-1)
+				|| wialon.core.Session.getInstance().checkFeature('avl_retranslator'))
 				initEnvironment();
-			else 
-				alert($.localise.tr("Retranslation service is not activated in your account. Please, contact your service administrator for details."));			
+			else
+				alert($.localise.tr("Retranslation service is not activated in your account. Please, contact your service administrator for details."));
 	});
 }
 
 /// Insert interface translations and bind handlers
 function initControls() {
-	
+
 	// IE style fix
 	if(navigator.appVersion.indexOf("MSIE 10") == -1 && navigator.appVersion.indexOf("MSIE") != -1) {
 		$("#retr_col_content").width(parseInt($("#retr_col").width())+16);
 		$("#prop_col_content").width(parseInt($("#prop_col").width())+15);
 	}
-	
+
 	$(window).resize( function() {searchUnits();});
-	
+
 	$("#retr_col_header").html($.localise.tr("Retranslator"));
 	$("#prop_col_header").html($.localise.tr("Retranslator properties"));
 	$("#units_col_header").html($.localise.tr("All units"));
@@ -282,6 +289,7 @@ function initControls() {
 			$("#retr_name").val($.localise.tr("New retranslator")).select().focus();
 			cancelPressed = false;
 		}
+		needUpdateRetrUnits = false;
 		return false;
 	});
 	$('#retr_history').on('click', function() {
@@ -590,12 +598,17 @@ function saveOrNot() {
 		oldConfig.debug = oldConfig.debug=="1"?"1":"0";
 		config.debug = oldConfig.debug;
 		var configs_equal = true;
-		for (var i in config)
+		// compare configs
+		for (var i in config) {
+			// add missing params
+			if (!(i in oldConfig)) {
+				oldConfig[i] = "0";
+			}
 			if (config[i] != oldConfig[i]) {
 				configs_equal = false;
 				break;
 			}
-		
+		}
 		if(name != curRetranslator.getName() || !configs_equal || needUpdateRetrUnits)
 			needUpdate =  true;
 	}
@@ -662,8 +675,8 @@ function checkHistoryOperating(retranslator) {
 			}
 			isHistoryRunning = !!stat.ru;
 			if (isHistoryRunning) {
-				timeFrom = (new Date(stat.hf * 1000)).dateFormat(DATE_TIME_FORMAT);
-				timeTo   = (new Date(stat.ht * 1000)).dateFormat(DATE_TIME_FORMAT);
+				timeFrom = wialon.util.DateTime.formatTime(stat.hf, false, WIALON_DATE_TIME_FORMAT);
+				timeTo   = wialon.util.DateTime.formatTime(stat.ht, false, WIALON_DATE_TIME_FORMAT);
 			}
 			$('#retr_hist_from').val(timeFrom).prop('disabled', isHistoryRunning);
 			$('#retr_hist_to').val(timeTo).prop('disabled', isHistoryRunning);
@@ -694,7 +707,8 @@ function onOperateRetranslatorHistory() {
 	}
 	var timeFrom = $('#retr_hist_from').val();
 	var timeTo = $('#retr_hist_to').val();
-	if (!timeFrom || !timeTo) {
+	var validDateFormat = /\d{2}\.\d{2}\.\d{4}\s{1}\d{2}:\d{2}/;
+	if (!timeFrom || !timeTo || !validDateFormat.test(timeFrom) || !validDateFormat.test(timeTo)) {
 		alert($.localise.tr("Please check selected interval."));
 		return false;
 	}
@@ -711,8 +725,16 @@ function onOperateRetranslatorHistory() {
 		}
 		isHistoryRunning = !!stat.ru;
 		if (!isHistoryRunning) {
-			operatingParams.timeFrom = Date.parseDate(timeFrom, DATE_TIME_FORMAT).getTime() / 1000;
-			operatingParams.timeTo = Date.parseDate(timeTo, DATE_TIME_FORMAT).getTime() / 1000;
+			var tf, tt;
+			tf = Date.parseDate(timeFrom, DATE_TIME_FORMAT);
+			tt = Date.parseDate(timeTo, DATE_TIME_FORMAT);
+
+			var serverTime = wialon.core.Session.getInstance().getServerTime();
+			var tz = wialon.util.DateTime.getTimezoneOffset();
+			var dst = wialon.util.DateTime.getDSTOffset(serverTime);
+
+			operatingParams.timeFrom = get_abs_time(Math.floor(tf.getTime() / 1000), tz, dst);
+			operatingParams.timeTo   = get_abs_time(Math.floor(tt.getTime() / 1000), tz, dst);
 		}
 		operatingParams.operate = newHistState = !isHistoryRunning;
 		curRetranslator.updateOperating(operatingParams, function(code) {
@@ -963,6 +985,34 @@ function redrawRetr(e) {
 			$("#retr_list tr:eq(0)").click();
 		$(row).remove();
 	}
+}
+
+/* functions for vork with time */
+function get_local_timezone() {
+	var rightNow = new Date();
+	var jan1 = new Date(rightNow.getFullYear(), 0, 1, 0, 0, 0, 0);  // jan 1st
+	var june1 = new Date(rightNow.getFullYear(), 6, 1, 0, 0, 0, 0); // june 1st
+	var temp = jan1.toGMTString();
+	var jan2 = new Date(temp.substring(0, temp.lastIndexOf(" ")-1));
+	temp = june1.toGMTString();
+	var june2 = new Date(temp.substring(0, temp.lastIndexOf(" ")-1));
+	var std_time_offset = ((jan1 - jan2) / (1000 * 60 * 60));
+	var daylight_time_offset = ((june1 - june2) / (1000 * 60 * 60));
+	var dst;
+	if (std_time_offset == daylight_time_offset) {
+		dst = "0"; // daylight savings time is NOT observed
+	} else {
+		// positive is southern, negative is northern hemisphere
+		var hemisphere = std_time_offset - daylight_time_offset;
+		if (hemisphere >= 0)
+			std_time_offset = daylight_time_offset;
+		dst = "1"; // daylight savings time is observed
+	}
+
+	return parseInt(std_time_offset*3600,10);
+}
+function get_abs_time(date_time, tz, dst) { /// Get absolute time from Date returned time
+	return date_time + get_local_timezone() - tz - dst;
 }
 
 /**
